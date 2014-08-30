@@ -5,13 +5,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.Toast;
 
-public class Background extends SurfaceView{
+public class Background extends SurfaceView implements OnTouchListener{
 	
 	public static final int ROW = 10;//行
 	public static final int COL = 10;//列
@@ -52,6 +55,7 @@ public class Background extends SurfaceView{
 			for (int j=0; j<COL; j++) {
 				Dot dot = getDot(j, i);
 				Paint paint = new Paint();
+				paint.setFlags(Paint.ANTI_ALIAS_FLAG);
 				switch (dot.getStatus()) {
 				case Dot.STATUS_OFF:
 					paint.setColor(0xFFEEEEEE);
@@ -74,7 +78,7 @@ public class Background extends SurfaceView{
 	}
 	
 	
-	Callback callback =  new Callback() {
+	private Callback callback =  new Callback() {
 		
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
@@ -95,6 +99,8 @@ public class Background extends SurfaceView{
 	};
 	
 	private void initGame() {
+		
+		setOnTouchListener(this);
 		
 		//init all dots
 		for (int i=0; i<ROW; i++) {
@@ -122,6 +128,36 @@ public class Background extends SurfaceView{
 	
 	private Dot getDot(int x, int y) {
 		return matrix[y][x];
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			break;
+		case MotionEvent.ACTION_MOVE:
+			break;
+		case MotionEvent.ACTION_UP:
+			int x = 0;
+			int y = 0;
+			y = (int) (Math.floor(event.getY()/width));
+			if (y % 2 == 0) { //奇数行
+				x = (int) (Math.floor(event.getX() / width));
+			} else {//偶数行
+				x = (int) (Math.floor((event.getX() - width/2) /width));
+			}
+			
+			if (x < 0 || y < 0 || x + 1 > COL || y + 1 > ROW) {
+				Toast.makeText(getContext(), "out", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+			
+			getDot(x, y).setStatus(Dot.STATUS_ON);
+			redraw();
+			
+			break;
+		}
+		return true;
 	}
 	
 
