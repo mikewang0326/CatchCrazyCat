@@ -1,7 +1,7 @@
 package com.thefivedesign.catchcrazycat;
 
 public class Dot {
-
+	
 	private int x;
 	private int y;
 
